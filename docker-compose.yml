@@ -1,0 +1,53 @@
+﻿services:
+  stream-app-api-app:
+    build:
+      context: .
+      dockerfile: StreamAppApi.App/Dockerfile
+    ports:
+      - "7140:7140"
+    volumes:
+      - stream-app-api-app:/app
+    networks:
+        - stream-app-network
+    depends_on:
+      - stream-app-api-db
+
+  stream-app-api-migrations:
+    build:
+      context: .
+      dockerfile: StreamAppApi.Migrations/Dockerfile
+    networks:
+      - stream-app-network
+    depends_on:
+      - stream-app-api-db
+
+  stream-app-api-db:
+    image: postgres:16.2
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: stream-platform
+    volumes:
+      - stream-app-api-db:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+        - stream-app-network
+  
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - "80:80"
+    networks:
+      - stream-app-network
+    depends_on:
+      - stream-app-api-app
+  
+volumes:
+  stream-app-api-app:
+  stream-app-api-db:
+      
+networks:
+    stream-app-network:

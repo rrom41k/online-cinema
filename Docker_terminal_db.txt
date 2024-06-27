@@ -1,0 +1,1 @@
+docker run --name online-cinema-db -v online-cinema:/var/lib/postgresql/data -p 5432:5432 -d postgres:16.2
